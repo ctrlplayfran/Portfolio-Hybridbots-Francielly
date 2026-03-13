@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Francielly Alves · Professora de Robótica & Dev</title>
+
+    <!-- Import fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Iconify (opcional, mantido para compatibilidade) -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0B0B0B;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ——— LOADING OVERLAY ——— */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;  /* fundo preto sólido */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.8s cubic-bezier(0.77, 0, 0.18, 1), visibility 0.8s;
+            pointer-events: all;
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            width: 280px;
+            max-width: 80vw;
+        }
+
+        /* Container da barra de progresso (5 blocos) */
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Contorno fino ao redor dos blocos */
+        .progress-bar-frame {
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            background: transparent;
+        }
+
+        /* Bloco individual (cubo com cantos arredondados) */
+        .progress-block {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px; /* cantos levemente arredondados */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0);
+        }
+
+        /* Classe para bloco preenchido (brilho branco intenso) */
+        .progress-block.filled {
+            background: #ffffff;
+            box-shadow: 0 0 20px #ffffff, 0 0 40px rgba(255, 255, 255, 0.6);
+        }
+
+        /* Nome principal */
+        .loader-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* Texto secundário com tracking */
+        .loader-sub {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #ffffff;
+            opacity: 0.8;
+        }
+
+        /* 3D Canvas container */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Main content overlay */
+        .content {
+            position: relative;
+            z-index: 10;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+            width: 100%;
+        }
+
+        .clickable { pointer-events: auto; }
+
+        h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(0.75rem, 2vh, 1.25rem) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: clamp(1rem, 3vh, 2rem);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFFFFF 0%, #AAAAAA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+            white-space: nowrap;
+        }
+
+        nav { display: flex; gap: clamp(1rem, 3vw, 2.5rem); order: 2; margin: 0 auto; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; align-items: center; gap: 0.75rem; }
+            .logo { width: 100%; text-align: center; white-space: normal; font-size: 1.2rem; }
+            nav { order: 1; width: 100%; justify-content: center; gap: 1.2rem; margin: 0.25rem 0; flex-wrap: wrap; }
+            nav a { font-size: 0.9rem; padding: 0.25rem 0; }
+            .visit-btn { order: 2; width: auto; min-width: 120px; margin: 0 auto; text-align: center; font-size: 0.85rem; padding: 0.5rem 1.2rem; }
+        }
+
+        @media (max-width: 480px) {
+            nav { gap: 0.8rem; }
+            nav a { font-size: 0.8rem; }
+            .visit-btn { min-width: 100px; padding: 0.4rem 1rem; font-size: 0.8rem; }
+        }
+
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+            position: relative;
+            padding: 0.25rem 0;
+        }
+
+        nav a:hover, nav a.active { color: #fff; }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #a855f7;
+            border-radius: 2px;
+        }
+
+        .visit-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.6rem clamp(1rem, 3vw, 1.8rem);
+            border-radius: 100px;
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+            white-space: nowrap;
+        }
+
+        .visit-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); }
+
+        .section { display: none; flex: 1; flex-direction: column; }
+        .section.active { display: flex; }
+
+        /* Hero / home */
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: clamp(2rem, 5vh, 3rem) 0 clamp(3rem, 8vh, 5rem);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border-radius: 100px;
+            padding: 0.5rem clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: clamp(2rem, 5vh, 3rem);
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+            color: #888;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge span { color: #fff; font-weight: 500; }
+        .badge .views { color: #666; }
+
+        h1 {
+            font-size: clamp(2.5rem, 12vw, 6rem);
+            font-weight: 700;
+            line-height: 1.05;
+            margin-bottom: clamp(1rem, 3vh, 1.5rem);
+            background: linear-gradient(135deg, #FFFFFF 0%, #CCCCCC 50%, #AAAAAA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            color: #888;
+            max-width: min(550px, 90%);
+            margin: 0 auto clamp(2rem, 5vh, 3rem);
+            line-height: 1.7;
+            padding: 0 1rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            justify-content: center;
+            margin-bottom: clamp(2rem, 6vh, 4rem);
+            flex-wrap: wrap;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .cta-primary, .cta-secondary { white-space: normal; min-width: 140px; }
+        }
+
+        .cta-primary, .cta-secondary {
+            padding: clamp(0.7rem, 2.5vw, 1rem) clamp(1.5rem, 5vw, 2.5rem);
+            border-radius: 100px;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #FF6B6B, #A855F7);
+            border: none;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.3);
+        }
+
+        .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(168, 85, 247, 0.5); }
+
+        .cta-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(8px);
+        }
+
+        .cta-secondary:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); }
+
+        .stats { display: flex; gap: clamp(2rem, 6vw, 4rem); justify-content: center; flex-wrap: wrap; padding: 0 1rem; }
+        .stat-item { text-align: center; min-width: 100px; }
+        .stat-number { font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+        .stat-label { color: #666; font-size: clamp(0.7rem, 2.5vw, 0.9rem); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* =====================================================
+           PROJETOS — TIRAS VERTICAIS (Aristide Benoist style)
+        ===================================================== */
+
+        /* Garante que seções ocultas não mostrem nada */
+        .section { overflow: hidden; }
+        .section:not(.active) { display: none !important; height: 0 !important; }
+
+        /* Custom cursor para as tiras */
+        #strip-cursor {
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        #strip-cursor .sc-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+        #strip-cursor .sc-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: #000;
+            background: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            position: absolute;
+            transform: translate(-50%, 18px);
+            white-space: nowrap;
+        }
+
+        /* Seção projetos */
+        .projetos {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: clamp(0.5rem, 1vh, 1rem) 0 0;
+            overflow: hidden;
+        }
+
+        .projetos-header {
+            margin-bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .projetos-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 400;
+            line-height: 1;
+            letter-spacing: 0.04em;
+            background: linear-gradient(135deg, #FFFFFF, #AAAAAA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .projetos-header .ano {
+            color: #666;
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* Área das tiras — ocupa todo o espaço restante */
+        #strips-area {
+            flex: 1;
+            position: relative;
+            pointer-events: auto;
+            min-height: 400px;
+        }
+
+        /* Container das tiras */
+        #proj-strips {
+            position: absolute;
+            inset: 0;
+            display: flex;
+        }
+
+        /* Tira individual */
+        .pstrip {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            cursor: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            transition: flex 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+        .pstrip:last-child { border-right: none; }
+        .pstrip:hover { flex: 3.5; }
+
+        /* Canvas WebGL por tira */
+        .pstrip-gl {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .pstrip:hover .pstrip-gl { opacity: 1; }
+
+        /* Foto de fundo */
+        .pstrip-img {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            opacity: 0;
+            transform: scale(1.06);
+            transition: opacity 0.55s 0.1s, transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+        .pstrip:hover .pstrip-img { opacity: 1; transform: scale(1); }
+
+        /* Overlay escuro */
+        .pstrip-overlay {
+            position: absolute; inset: 0;
+            background: #0B0B0B;
+            opacity: 0.88;
+            transition: opacity 0.55s;
+        }
+        .pstrip:hover .pstrip-overlay { opacity: 0.28; }
+
+        /* Fill sólido (visível quando não há hover) */
+        .pstrip-fill {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, #130920 0%, #0B0B0B 100%);
+            transition: opacity 0.5s;
+        }
+        .pstrip:hover .pstrip-fill { opacity: 0; }
+
+        /* Número da tira */
+        .pstrip-num {
+            position: absolute; top: 18px; left: 14px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+            opacity: 0.2;
+            transition: opacity 0.4s, color 0.4s;
+            z-index: 5;
+        }
+        .pstrip:hover .pstrip-num { opacity: 1; color: #a855f7; }
+
+        /* Label inferior */
+        .pstrip-label {
+            position: absolute; bottom: 24px; left: 14px; right: 14px;
+            z-index: 5;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 0.35s 0.1s, transform 0.35s 0.1s;
+        }
+        .pstrip:hover .pstrip-label { opacity: 1; transform: translateY(0); }
+
+        .pstrip-label h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(15px, 1.7vw, 28px);
+            letter-spacing: 0.04em; line-height: 1; color: #fff;
+        }
+        .pstrip-label p {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px; letter-spacing: 0.2em;
+            text-transform: uppercase; color: #a855f7;
+            margin-top: 4px;
+        }
+        .pstrip-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 7px; }
+        .pstrip-tag {
+            background: rgba(168, 85, 247, 0.12);
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            border-radius: 20px; padding: 2px 7px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #c084fc;
+        }
+
+        /* Painel expandido ao clicar */
+        #proj-expanded {
+            position: fixed; inset: 0;
+            z-index: 600;
+            background: #0B0B0B;
+            display: flex;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s;
+        }
+        #proj-expanded.open { opacity: 1; pointer-events: all; }
+
+        #pe-image { flex: 1; background-size: cover; background-position: center; }
+
+        #pe-info {
+            width: min(420px, 38vw);
+            padding: clamp(50px, 8vh, 90px) clamp(24px, 4vw, 44px);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        #pe-count {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+            color: #a855f7; margin-bottom: 14px;
+            opacity: 0; transition: opacity 0.4s 0.45s;
+        }
+        #proj-expanded.open #pe-count { opacity: 1; }
+
+        #pe-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 4.5vw, 68px);
+            line-height: 0.9; color: #fff; overflow: hidden;
+        }
+        #pe-title span {
+            display: block;
+            transform: translateY(105%);
+            transition: transform 0.65s 0.28s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        #proj-expanded.open #pe-title span { transform: translateY(0); }
+
+        #pe-category {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+            color: #a855f7; margin-top: 12px;
+            opacity: 0; transition: opacity 0.4s 0.52s;
+        }
+        #proj-expanded.open #pe-category { opacity: 1; }
+
+        #pe-desc {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.5);
+            margin-top: 16px;
+            opacity: 0; transition: opacity 0.4s 0.62s;
+        }
+        #proj-expanded.open #pe-desc { opacity: 1; }
+
+        #pe-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            margin-top: 18px; color: #a855f7;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;
+            text-decoration: none;
+            opacity: 0; transition: opacity 0.4s 0.72s, gap 0.2s;
+            cursor: pointer;
+        }
+        #proj-expanded.open #pe-link { opacity: 1; }
+        #pe-link:hover { gap: 13px; }
+
+        #pe-close {
+            position: absolute; top: 28px; right: 32px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+            color: #fff; cursor: pointer; opacity: 0.4; transition: opacity 0.2s;
+        }
+        #pe-close:hover { opacity: 1; }
+
+        @media (max-width: 768px) {
+            #proj-expanded { flex-direction: column; }
+            #pe-image { flex: none; height: 40vh; }
+            #pe-info { width: 100%; padding: 20px; border-left: none; border-top: 1px solid rgba(255,255,255,0.06); }
+            #strips-area { min-height: 360px; }
+        }
+
+        /* ===== SOBRE MIM SECTION ===== */
+        .sobre-mim {
+            flex: 1;
+            padding: clamp(1rem, 3vh, 2rem) 0 clamp(3rem, 8vh, 6rem);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .sobre-hero { margin-bottom: clamp(2rem, 6vh, 5rem); position: relative; }
+
+        .sobre-titulo-principal {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(3rem, 15vw, 12rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: clamp(1rem, 3vh, 2rem);
+            letter-spacing: -0.02em;
+        }
+
+        .sobre-titulo-principal span {
+            background: linear-gradient(135deg, #FF6B6B, #A855F7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .sobre-subtitulo {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            color: #888;
+            max-width: min(800px, 100%);
+            margin-bottom: clamp(2rem, 5vh, 3rem);
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .sobre-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: clamp(1rem, 4vw, 2rem);
+            margin-bottom: clamp(2rem, 6vh, 5rem);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: clamp(1.5rem, 5vh, 3rem) 0;
+        }
+
+        .stat-large { text-align: center; }
+
+        .stat-large .numero {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            line-height: 1;
+            color: #a855f7;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-large .label {
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .sobre-timeline { margin-bottom: clamp(2rem, 6vh, 5rem); }
+
+        .timeline-title {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            text-transform: uppercase;
+            margin-bottom: clamp(1.5rem, 4vh, 3rem);
+            color: #fff;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: clamp(1rem, 4vw, 3rem);
+            padding: clamp(1rem, 3vh, 2rem) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-wrap: wrap;
+        }
+
+        .timeline-item:hover { border-bottom-color: #a855f7; padding-left: 1rem; }
+
+        .timeline-ano {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(1.2rem, 5vw, 2rem);
+            color: #a855f7;
+            min-width: 120px;
+        }
+
+        .timeline-content { flex: 1; }
+        .timeline-content h3 { font-size: clamp(1.1rem, 4vw, 2rem); font-weight: 600; margin-bottom: 0.5rem; }
+        .timeline-content h4 { font-size: clamp(0.9rem, 3.5vw, 1.2rem); color: #888; font-weight: 400; margin-bottom: 1rem; }
+        .timeline-content p { color: #aaa; font-size: clamp(0.85rem, 3vw, 1rem); line-height: 1.8; max-width: 600px; }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: clamp(2rem, 6vh, 5rem);
+        }
+
+        .skill-item {
+            background: #0B0B0B;
+            padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 3vw, 2rem);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .skill-item:hover {
+            background: #a855f7;
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+        }
+
+        .skill-item:hover .skill-name, .skill-item:hover .skill-level { color: #fff; }
+
+        .skill-name {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .skill-level { font-size: 0.9rem; color: #666; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .contato-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: clamp(1.5rem, 5vh, 3rem) 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: clamp(1.5rem, 5vh, 3rem);
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .contato-section { flex-direction: column; text-align: center; gap: 1rem; }
+            .contato-email { font-size: clamp(1rem, 4vw, 1.5rem); word-break: break-word; width: 100%; }
+            .contato-social { justify-content: center; gap: 1.5rem; width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            .contato-email { font-size: 1rem; line-height: 1.4; }
+            .social-link { font-size: 0.9rem; }
+        }
+
+        .contato-email {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(1.2rem, 5vw, 2.5rem);
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-all;
+        }
+
+        .contato-email:hover { color: #a855f7; }
+        .contato-social { display: flex; gap: clamp(1rem, 4vw, 2rem); flex-wrap: wrap; justify-content: center; }
+
+        .social-link { color: #888; text-decoration: none; font-size: clamp(0.9rem, 3.5vw, 1.1rem); transition: color 0.3s; }
+        .social-link:hover { color: #a855f7; }
+
+        .bio-destaque {
+            font-size: clamp(1.1rem, 4vw, 2rem);
+            line-height: 1.4;
+            color: #ccc;
+            max-width: min(900px, 100%);
+            margin: clamp(1.5rem, 5vh, 3rem) 0;
+            font-weight: 300;
+        }
+
+        .bio-destaque strong { color: #a855f7; font-weight: 600; }
+
+        footer {
+            margin-top: auto;
+            padding: clamp(1rem, 3vh, 2rem) 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            footer { flex-direction: column; text-align: center; gap: 0.75rem; padding: 1rem 0; }
+            footer > div:first-child { width: 100%; text-align: center; font-size: 0.8rem; }
+            .footer-links { width: 100%; justify-content: center; gap: 1.5rem; }
+            .footer-links a { font-size: 0.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            footer { gap: 0.5rem; }
+            .footer-links { gap: 1rem; }
+            .footer-links a { font-size: 0.75rem; }
+        }
+
+        .footer-links { display: flex; gap: clamp(1rem, 4vw, 2rem); flex-wrap: wrap; }
+        .footer-links a { color: #666; text-decoration: none; transition: color 0.2s; cursor: pointer; }
+        .footer-links a:hover { color: #fff; }
+
+        @media (hover: none) and (pointer: coarse) {
+            .timeline-item:hover, .skill-item:hover { transform: none; }
+            nav a.active::after { height: 3px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADING OVERLAY (SUBSTITUÍDO PELA NOVA BARRA) -->
+    <div id="loading-overlay">
+        <div class="loader-content">
+            <!-- Barra de progresso com 5 blocos -->
+            <div class="progress-bar-container">
+                <div class="progress-bar-frame" id="progressFrame">
+                    <div class="progress-block" id="block1"></div>
+                    <div class="progress-block" id="block2"></div>
+                    <div class="progress-block" id="block3"></div>
+                    <div class="progress-block" id="block4"></div>
+                    <div class="progress-block" id="block5"></div>
+                </div>
+            </div>
+            <!-- Textos conforme solicitado -->
+            <div class="loader-name">FRANCIELLY ALVES</div>
+            <div class="loader-sub">CARREGANDO EXPERIÊNCIA</div>
+        </div>
+    </div>
+
+    <!-- Custom cursor para as tiras -->
+    <div id="strip-cursor">
+        <div class="sc-dot"></div>
+        <div class="sc-label">Ver Projeto</div>
+    </div>
+
+    <!-- 3D Canvas container -->
+    <div id="canvas-container"></div>
+
+    <!-- Content overlay -->
+    <div class="content">
+        <header class="clickable">
+            <div class="logo">Hybridbots · Francielly Alves</div>
+            <nav>
+                <a href="#" class="nav-link active" data-section="home">Index</a>
+                <a href="#" class="nav-link" data-section="projetos">Projetos</a>
+                <a href="#" class="nav-link" data-section="sobre">Sobre mim</a>
+            </nav>
+            <button class="visit-btn" onclick="window.open('https://whatsapp.com/66996915943', '_blank')">WhatsApp →</button>
+        </header>
+
+        <!-- HOME SECTION -->
+        <section id="home" class="section active">
+            <main class="hero">
+                <div class="badge clickable">
+                    <span>PROFESSORA DE ROBÓTICA</span>
+                    <span class="views">· DESENVOLVEDORA FULL STACK</span>
+                </div>
+                <h1 id="hero-title">Francielly Alves</h1>
+                <p class="subtitle" id="hero-subtitle">Transformando ideias em realidade através da tecnologia e educação</p>
+                <div class="cta-group">
+                    <button class="cta-primary" onclick="document.querySelector('[data-section=projetos]').click()">Ver projetos</button>
+                    <button class="cta-secondary" onclick="document.querySelector('[data-section=sobre]').click()">Sobre mim</button>
+                </div>
+                <div class="stats">
+                    <div class="stat-item"><div class="stat-number" id="stat1">0</div><div class="stat-label">Anos de experiência</div></div>
+                    <div class="stat-item"><div class="stat-number" id="stat2">0</div><div class="stat-label">Projetos entregues</div></div>
+                    <div class="stat-item"><div class="stat-number" id="stat3">0</div><div class="stat-label">Alunos</div></div>
+                </div>
+            </main>
+        </section>
+
+        <!-- =====================================================
+             PROJETOS — TIRAS VERTICAIS
+        ===================================================== -->
+        <section id="projetos" class="section projetos">
+            <div class="projetos-header">
+                <h2>Projetos selecionados</h2>
+                <div class="ano">2022 — 2026</div>
+            </div>
+            <!-- As tiras são geradas pelo JavaScript abaixo -->
+            <div id="strips-area">
+                <div id="proj-strips"></div>
+            </div>
+
+            <!-- Painel expandido ao clicar numa tira — fica dentro da section -->
+            <div id="proj-expanded">
+                <div id="pe-image"></div>
+                <div id="pe-info">
+                    <div id="pe-count"></div>
+                    <div id="pe-title"><span id="pe-title-txt"></span></div>
+                    <div id="pe-category"></div>
+                    <div id="pe-desc"></div>
+                    <a href="#" id="pe-link" target="_blank">Ver projeto →</a>
+                </div>
+                <div id="pe-close">← Fechar</div>
+            </div>
+        </section>
+
+        <!-- SOBRE MIM SECTION -->
+        <section id="sobre" class="section sobre-mim">
+            <div class="sobre-hero">
+                <h1 class="sobre-titulo-principal">
+                    CRIATIVA<br>EM <span>FRONT-END</span><br>E UI/UX
+                </h1>
+                <p class="sobre-subtitulo">
+                    Licenciada em Física, com especialização em Robótica Educacional. Transformando o aprendizado através da tecnologia e inovação.
+                </p>
+            </div>
+            <div class="sobre-stats">
+                <div class="stat-large"><div class="numero" id="statAnos">5+</div><div class="label">Anos de experiência</div></div>
+                <div class="stat-large"><div class="numero" id="statProjetos">20+</div><div class="label">Projetos realizados</div></div>
+                <div class="stat-large"><div class="numero" id="statTecnologias">200+</div><div class="label">Alunos impactados</div></div>
+            </div>
+            <div class="sobre-timeline">
+                <h2 class="timeline-title">Experiência</h2>
+                <div class="timeline-item">
+                    <div class="timeline-ano">2022 — Presente</div>
+                    <div class="timeline-content">
+                        <h3>Professora de Robótica</h3>
+                        <h4>CTRL+PLAY (Sorriso-MT)</h4>
+                        <p>Desenvolvimento de projetos em IA, Visão Computacional e PLN. Integração hardware/software, jogos e protótipos interativos.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-ano">2020 — 2022</div>
+                    <div class="timeline-content">
+                        <h3>Professora de Robótica</h3>
+                        <h4>Colégio Marista de Goiânia</h4>
+                        <p>Tutora da equipe Mars Rover - Prêmio de Inovação (OBR-GO). 2º lugar Sumô de Robôs e 3º lugar Cabo de Guerra (Interschool Brasil).</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-ano">2019 — 2020</div>
+                    <div class="timeline-content">
+                        <h3>Professora de Robótica</h3>
+                        <h4>Colégio Mais Ânima</h4>
+                        <p>Desenvolvimento de pulseira inteligente para monitoramento de atletas autistas. Finalista no HackaNav - Top 10 do Brasil.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-item"><div class="skill-name">Arduino</div><div class="skill-level">Avançado</div></div>
+                <div class="skill-item"><div class="skill-name">Python</div><div class="skill-level">Avançado</div></div>
+                <div class="skill-item"><div class="skill-name">React</div><div class="skill-level">Intermediário</div></div>
+                <div class="skill-item"><div class="skill-name">OpenCV</div><div class="skill-level">Avançado</div></div>
+                <div class="skill-item"><div class="skill-name">Node.js</div><div class="skill-level">Intermediário</div></div>
+                <div class="skill-item"><div class="skill-name">Unity</div><div class="skill-level">Intermediário</div></div>
+                <div class="skill-item"><div class="skill-name">MySQL</div><div class="skill-level">Intermediário</div></div>
+                <div class="skill-item"><div class="skill-name">Blender</div><div class="skill-level">Intermediário</div></div>
+            </div>
+            <div class="bio-destaque">
+                <strong>Sobre mim</strong><br><br>
+                Licenciada em Física, com especialização em Robótica Educacional. Atuo como <strong>Professora de Robótica na CTRL+PLAY (Sorriso-MT)</strong> e como Desenvolvedora Web Full Stack.<br><br>
+                Já passei por instituições como Colégio Marista, Colégio Ânima, Colégio Mais Ânima, Colégio Excelso e Colégio Anglo, sempre desenvolvendo projetos inovadores em <strong>robótica, IA e visão computacional</strong>.
+            </div>
+            <div class="contato-section">
+                <a href="mailto:professorafisicafran@gmail.com" class="contato-email">professorafisicafran@gmail.com</a>
+                <div class="contato-social">
+                    <a href="https://www.linkedin.com/in/francielly-alves-pereira-128680241/" target="_blank" class="social-link">LinkedIn</a>
+                    <a href="https://www.instagram.com/hybridbots/" target="_blank" class="social-link">Instagram</a>
+                    <a href="https://github.com/ctrlplayfran" target="_blank" class="social-link">GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="clickable">
+            <div>© 2026 Francielly Alves · Portfólio</div>
+            <div class="footer-links">
+                <a href="#" onclick="document.querySelector('[data-section=home]').click()">Index</a>
+                <a href="#" onclick="document.querySelector('[data-section=projetos]').click()">Projetos</a>
+                <a href="#" onclick="document.querySelector('[data-section=sobre]').click()">Sobre</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // --- NOVO LOADING COM 5 BLOCOS ---
+        const overlay = document.getElementById('loading-overlay');
+        const blocks = [
+            document.getElementById('block1'),
+            document.getElementById('block2'),
+            document.getElementById('block3'),
+            document.getElementById('block4'),
+            document.getElementById('block5')
+        ];
+
+        // Função para preencher os blocos sequencialmente
+        function animateLoading() {
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    // Quando o 5º bloco terminar, fade-out do overlay
+                    gsap.to(overlay, {
+                        opacity: 0,
+                        visibility: 'hidden',
+                        pointerEvents: 'none',
+                        duration: 0.8,
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            // Inicia animações da home após o loading desaparecer
+                            animateHome();
+                            setupSectionAnimations();
+                        }
+                    });
+                }
+            });
+
+            // Sequência: cada bloco recebe a classe 'filled' em intervalos
+            blocks.forEach((block, index) => {
+                tl.to({}, { duration: 0.6 }) // intervalo entre blocos
+                  .call(() => {
+                      block.classList.add('filled');
+                  }, null, `+=${index === 0 ? 0.2 : 0}`); // primeiro começa rápido
+            });
+        }
+
+        // Inicia a animação assim que a página carregar
+        window.addEventListener('load', () => {
+            animateLoading();
+        });
+
+        // Fallback: se algo demorar muito, garante que o loading suma (segurança)
+        setTimeout(() => {
+            if (!overlay.classList.contains('hidden') && overlay.style.visibility !== 'hidden') {
+                gsap.to(overlay, {
+                    opacity: 0,
+                    visibility: 'hidden',
+                    pointerEvents: 'none',
+                    duration: 0.8,
+                    ease: "power2.inOut"
+                });
+                animateHome();
+                setupSectionAnimations();
+            }
+        }, 6000); // 6 segundos no máximo
+
+        function animateHome() {
+            const tl = gsap.timeline({ delay: 0.5 });
+            tl.from('.badge', { y: 30, opacity: 0, duration: 0.8, ease: "back.out(1.2)" })
+              .from('#hero-title', { y: 50, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.4")
+              .from('#hero-subtitle', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+              .from('.cta-group', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+              .from('.stat-item', { y: 30, opacity: 0, duration: 0.8, stagger: 0.2, ease: "power3.out" }, "-=0.4");
+            gsap.to('#stat1', { duration: 2, innerText: 5,   snap: { innerText: 1 }, ease: "power2.out", delay: 1.5 });
+            gsap.to('#stat2', { duration: 2, innerText: 20,  snap: { innerText: 1 }, ease: "power2.out", delay: 1.5 });
+            gsap.to('#stat3', { duration: 2, innerText: 200, snap: { innerText: 1 }, ease: "power2.out", delay: 1.5 });
+        }
+
+        function setupSectionAnimations() {
+            gsap.set('.sobre-titulo-principal', { y: 100, opacity: 0 });
+            gsap.set('.sobre-titulo-principal span', { scale: 0.5, opacity: 0 });
+            gsap.set('.sobre-subtitulo', { y: 50, opacity: 0 });
+            gsap.set('.stat-large', { scale: 0.5, opacity: 0 });
+            gsap.set('.timeline-item', { x: -100, opacity: 0 });
+            gsap.set('.skill-item', { scale: 0, opacity: 0 });
+            gsap.set('.bio-destaque', { y: 50, opacity: 0 });
+            gsap.set('.contato-section', { y: 50, opacity: 0 });
+        }
+
+        function animateSobreEntry() {
+            const tl = gsap.timeline();
+            tl.to('.sobre-titulo-principal', { y: 0, opacity: 1, duration: 1.2, ease: 'power4.out' })
+              .to('.sobre-titulo-principal span', { scale: 1, opacity: 1, duration: 1, ease: 'back.out(1.7)' }, '-=0.8')
+              .to('.sobre-subtitulo', { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }, '-=0.6')
+              .to('.stat-large', { scale: 1, opacity: 1, duration: 1, stagger: 0.2, ease: 'back.out(1.2)' }, '-=0.4')
+              .to('.timeline-item', { x: 0, opacity: 1, duration: 1, stagger: 0.3, ease: 'power4.out' }, '-=0.2')
+              .to('.skill-item', { scale: 1, opacity: 1, duration: 0.8, stagger: 0.05, ease: 'back.out(1.2)' }, '-=0.2')
+              .to('.bio-destaque', { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }, '-=0.2')
+              .to('.contato-section', { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }, '-=0.2');
+        }
+
+        // Hover effects nos skills
+        document.querySelectorAll('.skill-item').forEach(skill => {
+            skill.addEventListener('mouseenter', () => gsap.to(skill, { scale: 1.05, duration: 0.3, ease: 'power2.out' }));
+            skill.addEventListener('mouseleave', () => gsap.to(skill, { scale: 1, duration: 0.3, ease: 'power2.out' }));
+        });
+
+        // =====================================================
+        // TIRAS VERTICAIS — dados e lógica
+        // =====================================================
+        const PROJECTS = [
+            { num:'01', title:'Site para Corretor',    cat:'Web App',                yr:'2025', tags:['HTML/CSS','Responsivo'],  desc:'Site profissional responsivo com design moderno para corretor de imóveis. Interface clean e otimizada para conversão.',          link:'projetos/projeto-site-corretor.html', seed:3   },
+            { num:'02', title:'Plataforma de Login',   cat:'Full Stack',             yr:'2025', tags:['React','Node.js'],        desc:'Sistema completo de autenticação com React + Node.js. Inclui cadastro, login e recuperação de senha.',                         link:'projetos/cadastro-usuarios.html',     seed:20  },
+            { num:'03', title:'Grogu — IA',            cat:'Inteligência Artificial',yr:'2024', tags:['Python','NLP'],           desc:'Assistente virtual com processamento de linguagem natural. Capaz de interagir e responder perguntas de forma contextual.',     link:'projetos/grogu.html',                 seed:37  },
+            { num:'04', title:'Mão Robótica',          cat:'Visão Computacional',    yr:'2024', tags:['OpenCV','Python'],        desc:'Controle por visão computacional com OpenCV. A mão robótica replica os movimentos da mão humana em tempo real.',                link:'projetos/mao-robotica.html',          seed:54  },
+            { num:'05', title:'Olhos Vigia',           cat:'Monitoramento',          yr:'2023', tags:['OpenCV','Python'],        desc:'Sistema de monitoramento com detecção facial. Identifica e rastreia rostos em tempo real para segurança.',                     link:'projetos/olhos-vigia.html',           seed:71  },
+            { num:'06', title:'Robô Galinha',          cat:'Robótica',               yr:'2023', tags:['Arduino','Sensor'],       desc:'Robô seguidor de linha com Arduino. Utiliza sensores infravermelhos para seguir trajetórias pré-definidas.',                   link:'projetos/robo-galinha.html',          seed:88  },
+            { num:'07', title:'Varal Automatizado',    cat:'Automação',              yr:'2023', tags:['Arduino','Sensor'],       desc:'Sensor de chuva para proteção automática. Recolhe as roupas automaticamente quando detecta chuva.',                            link:'projetos/varal-automatizado.html',    seed:105 },
+            { num:'08', title:'Irrigador Automático',  cat:'IoT',                    yr:'2022', tags:['Arduino','Sensor'],       desc:'Sensor de umidade para plantas. Irriga automaticamente quando o solo está seco, economizando água.',                          link:'projetos/irrigador-automatico.html',  seed:122 },
+            { num:'09', title:'Bob Esponja',           cat:'Robótica',               yr:'2022', tags:['Arduino','Bluetooth'],    desc:'Robô controlado por Bluetooth. Pode ser operado via smartphone com interface personalizada.',                                  link:'projetos/bob-esponja.html',           seed:139 },
+            { num:'10', title:'Angry Birds',           cat:'Jogo Educativo',         yr:'2022', tags:['Scratch','Interativo'],   desc:'Versão educacional do Angry Birds para ensinar lógica de programação com sistema de pontuação.',                             link:'projetos/angry-birds.html',           seed:156 },
+            { num:'11', title:'Labirinto',             cat:'Jogo',                   yr:'2022', tags:['Arduino','Joystick'],     desc:'Desafio de navegar por um labirinto físico usando um robô controlado por joystick remotamente.',                             link:'projetos/labirinto.html',             seed:173 },
+            { num:'12', title:'Sistema de Cadastro',   cat:'CRUD',                   yr:'2025', tags:['React','MySQL'],          desc:'CRUD completo com React, Node.js e MySQL. Sistema de gerenciamento de usuários com interface intuitiva.',                     link:'projetos/cadastro-usuarios.html',     seed:190 },
+        ];
+
+        // Cursor das tiras
+        const stripCursor = document.getElementById('strip-cursor');
+        let scx = 0, scy = 0;
+        document.addEventListener('mousemove', e => {
+            scx = e.clientX; scy = e.clientY;
+            stripCursor.style.transform = `translate(${scx}px,${scy}px)`;
+        });
+
+        // Constrói as tiras
+        function buildStrips() {
+            const container = document.getElementById('proj-strips');
+            if (!container || container.children.length > 0) return;
+
+            PROJECTS.forEach((p, i) => {
+                const strip = document.createElement('div');
+                strip.className = 'pstrip';
+                strip.innerHTML =
+                    '<canvas class="pstrip-gl" id="pgl' + i + '"></canvas>' +
+                    '<div class="pstrip-img" style="background-image:url(\'https://picsum.photos/seed/' + p.seed + '/800/1200\')"></div>' +
+                    '<div class="pstrip-overlay"></div>' +
+                    '<div class="pstrip-fill"></div>' +
+                    '<div class="pstrip-num">' + p.num + '</div>' +
+                    '<div class="pstrip-label">' +
+                        '<h3>' + p.title + '</h3>' +
+                        '<p>' + p.cat + '</p>' +
+                        '<div class="pstrip-tags">' + p.tags.map(t => '<span class="pstrip-tag">' + t + '</span>').join('') + '</div>' +
+                    '</div>';
+
+                strip.addEventListener('mouseenter', () => { stripCursor.style.opacity = '1'; });
+                strip.addEventListener('mouseleave', () => { stripCursor.style.opacity = '0'; });
+                strip.addEventListener('click', () => openProject(i));
+                container.appendChild(strip);
+
+                // WebGL noise shader por tira
+                initStripGL(i, p);
+            });
+
+            // Animação de entrada das tiras
+            gsap.fromTo('.pstrip',
+                { scaleY: 0, transformOrigin: 'bottom' },
+                { scaleY: 1, duration: 1, stagger: 0.04, ease: 'power3.out', delay: 0.1 }
+            );
+        }
+
+        function initStripGL(idx, p) {
+            const canvas = document.getElementById('pgl' + idx);
+            if (!canvas) return;
+            const gl = canvas.getContext('webgl');
+            if (!gl) return;
+
+            const VS = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+            const FS = 'precision mediump float;' +
+                'uniform float T,H;uniform vec2 R;' +
+                'vec3 hsv(vec3 c){vec4 K=vec4(1.,2./3.,1./3.,3.);vec3 p=abs(fract(c.xxx+K.xyz)*6.-K.www);return c.z*mix(K.xxx,clamp(p-K.xxx,0.,1.),c.y);}' +
+                'float rnd(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}' +
+                'float sn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(rnd(i),rnd(i+vec2(1,0)),f.x),mix(rnd(i+vec2(0,1)),rnd(i+vec2(1,1)),f.x),f.y);}' +
+                'void main(){vec2 uv=gl_FragCoord.xy/R;float v=sn(uv*3.+T*.1)*.6+sn(uv*6.-T*.07+42.)*.4;' +
+                'gl_FragColor=vec4(hsv(vec3(H+v*.07,.38+v*.18,.05+v*.08)),1.);}';
+
+            function mk(t, s) { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); return x; }
+            const prog = gl.createProgram();
+            gl.attachShader(prog, mk(gl.VERTEX_SHADER, VS));
+            gl.attachShader(prog, mk(gl.FRAGMENT_SHADER, FS));
+            gl.linkProgram(prog); gl.useProgram(prog);
+
+            const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+            const loc = gl.getAttribLocation(prog, 'a');
+            gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+            const uT = gl.getUniformLocation(prog, 'T');
+            const uH = gl.getUniformLocation(prog, 'H');
+            const uR = gl.getUniformLocation(prog, 'R');
+            const hue = idx / PROJECTS.length;
+
+            function resize() {
+                canvas.width  = canvas.offsetWidth  || 50;
+                canvas.height = canvas.offsetHeight || 300;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const t0 = performance.now();
+            (function draw() {
+                const t = (performance.now() - t0) / 1000;
+                gl.uniform1f(uT, t); gl.uniform1f(uH, hue);
+                gl.uniform2f(uR, canvas.width, canvas.height);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                requestAnimationFrame(draw);
+            })();
+        }
+
+        // Abre painel expandido
+        let expanded = false;
+        function openProject(idx) {
+            if (expanded) return;
+            expanded = true;
+            const p = PROJECTS[idx];
+            const panel = document.getElementById('proj-expanded');
+            document.getElementById('pe-image').style.backgroundImage = "url('https://picsum.photos/seed/" + p.seed + "/1200/900')";
+            document.getElementById('pe-title-txt').textContent = p.title;
+            document.getElementById('pe-category').textContent  = p.cat + ' · ' + p.yr;
+            document.getElementById('pe-desc').textContent      = p.desc;
+            document.getElementById('pe-count').textContent     = p.num + ' / ' + String(PROJECTS.length).padStart(2,'0');
+            document.getElementById('pe-link').href             = p.link;
+            panel.classList.add('open');
+            stripCursor.style.opacity = '0';
+        }
+
+        document.getElementById('pe-close').addEventListener('click', () => {
+            document.getElementById('proj-expanded').classList.remove('open');
+            expanded = false;
+        });
+
+        // Navegação entre abas
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = {
+            home: document.getElementById('home'),
+            projetos: document.getElementById('projetos'),
+            sobre: document.getElementById('sobre')
+        };
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = link.dataset.section;
+                if (!id) return;
+
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                Object.values(sections).forEach(s => s.classList.remove('active'));
+                sections[id].classList.add('active');
+                window.scrollTo(0, 0);
+
+                if (id === 'projetos') buildStrips();
+                if (id === 'sobre') animateSobreEntry();
+            });
+        });
+
+        // Three.js — igual ao original
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0B0B0B);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(4, 2, 8);
+        camera.lookAt(0, 0, 0);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.5;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.enableRotate = false;
+
+        const ambientLight = new THREE.AmbientLight(0x404060);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(5, 10, 7);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        const colors = [0xff4d4d, 0xa855f7, 0x3b82f6];
+        const positions = [[3, 2, 3], [-3, 1, 3], [0, 3, -3]];
+        colors.forEach((color, i) => {
+            const light = new THREE.PointLight(color, 1, 15);
+            light.position.set(positions[i][0], positions[i][1], positions[i][2]);
+            scene.add(light);
+        });
+        const backLight = new THREE.PointLight(0x4466ff, 0.8);
+        backLight.position.set(-2, 1, -5);
+        scene.add(backLight);
+
+        const cubeGroup = new THREE.Group();
+        const cubeGeo = new THREE.BoxGeometry(2.2, 2.2, 2.2);
+        const materials = [
+            new THREE.MeshStandardMaterial({ color: 0xff5555, emissive: 0x331111, roughness: 0.3, metalness: 0.1 }),
+            new THREE.MeshStandardMaterial({ color: 0x5555ff, emissive: 0x111133, roughness: 0.3, metalness: 0.1 }),
+            new THREE.MeshStandardMaterial({ color: 0x55ff55, emissive: 0x113311, roughness: 0.3, metalness: 0.1 }),
+            new THREE.MeshStandardMaterial({ color: 0xffff55, emissive: 0x333311, roughness: 0.3, metalness: 0.1 }),
+            new THREE.MeshStandardMaterial({ color: 0xff55ff, emissive: 0x331133, roughness: 0.3, metalness: 0.1 }),
+            new THREE.MeshStandardMaterial({ color: 0x55ffff, emissive: 0x113333, roughness: 0.3, metalness: 0.1 })
+        ];
+        const cube = new THREE.Mesh(cubeGeo, materials);
+        cube.castShadow = true;
+        cubeGroup.add(cube);
+
+        const innerCubeGeo = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+        const innerCubeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x442288, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.8 });
+        const innerCube = new THREE.Mesh(innerCubeGeo, innerCubeMat);
+        cubeGroup.add(innerCube);
+
+        const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(2.25, 2.25, 2.25));
+        const wireframe = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 }));
+        cubeGroup.add(wireframe);
+
+        for (let i = 0; i < 6; i++) {
+            const orbGeo = new THREE.SphereGeometry(0.15, 16, 16);
+            const orbMat = new THREE.MeshStandardMaterial({ color: colors[i % 3], emissive: colors[i % 3], emissiveIntensity: 0.5 });
+            const orb = new THREE.Mesh(orbGeo, orbMat);
+            const angle = (i / 6) * Math.PI * 2;
+            orb.position.set(Math.cos(angle) * 1.8, Math.sin(angle * 2) * 0.8, Math.sin(angle) * 1.8);
+            cubeGroup.add(orb);
+        }
+        scene.add(cubeGroup);
+
+        const particlesGeo = new THREE.BufferGeometry();
+        const posArray = new Float32Array(4500);
+        for (let i = 0; i < 4500; i += 3) {
+            posArray[i]     = (Math.random() - 0.5) * 40;
+            posArray[i + 1] = (Math.random() - 0.5) * 40;
+            posArray[i + 2] = (Math.random() - 0.5) * 40;
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMat = new THREE.PointsMaterial({ size: 0.1, color: 0x888888, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+        const particles = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particles);
+
+        const gridHelper = new THREE.GridHelper(15, 20, 0x666666, 0x333333);
+        gridHelper.position.y = -1.5;
+        scene.add(gridHelper);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cubeGroup.rotation.x += 0.002;
+            cubeGroup.rotation.y += 0.003;
+            innerCube.rotation.x -= 0.004;
+            innerCube.rotation.y -= 0.006;
+            particles.rotation.y += 0.0002;
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.getElementById('canvas-container').style.pointerEvents = 'none';
+    </script>
+</body>
+</html>
