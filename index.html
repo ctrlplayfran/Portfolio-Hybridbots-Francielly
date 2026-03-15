@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap"
         rel="stylesheet">
 
     <!-- Iconify (opcional, mantido para compatibilidade) -->
@@ -901,6 +901,176 @@
                 color: #a855f7 !important;
             }
         }
+
+        /* ====================================
+           CONTATO — WIDGET HYBRIDBOTS
+        ==================================== */
+        .contato-widget-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: clamp(2rem, 6vh, 4rem);
+        }
+
+        #hb-widget {
+            position: relative;
+            width: min(480px, 100%);
+            min-height: 500px;
+            background: #000;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 36px;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        #hb-stars {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 24px;
+        }
+
+        .hb-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hb-brand {
+            color: #fff;
+            font-size: 11.5px;
+            letter-spacing: 0.25em;
+            font-weight: 300;
+            font-family: 'Barlow Condensed', sans-serif;
+        }
+
+        .hb-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        #hb-label {
+            color: #fff;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            letter-spacing: 0.08em;
+            font-weight: 400;
+            transition: opacity 0.35s, transform 0.35s;
+            white-space: nowrap;
+        }
+
+        #hb-pill {
+            height: 46px;
+            border-radius: 23px;
+            background: #1c1c1c;
+            display: flex;
+            align-items: center;
+            width: 46px;
+            transition: width 0.6s cubic-bezier(0.77, 0, 0.18, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #hb-inp {
+            position: absolute;
+            left: 0; top: 0;
+            height: 100%;
+            width: calc(100% - 46px);
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 11.5px;
+            letter-spacing: 0.2em;
+            padding: 0 0 0 20px;
+            font-family: 'Barlow Condensed', sans-serif;
+            opacity: 0;
+            transition: opacity 0.3s 0.3s;
+            pointer-events: none;
+            caret-color: #fff;
+        }
+
+        #hb-inp::placeholder { color: rgba(255,255,255,0.38); letter-spacing: 0.2em; }
+
+        #hb-btn {
+            position: absolute;
+            right: 0; top: 0;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: #2e2e2e;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            transition: background 0.2s;
+        }
+        #hb-btn:hover { background: #3a3a3a; }
+
+        .hb-social-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .hb-social-label {
+            color: rgba(255,255,255,0.35);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+        }
+
+        .hb-social-row { display: flex; gap: 16px; align-items: center; }
+
+        .hb-icon {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .hb-icon:hover { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.06); }
+
+        .hb-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hb-footer span {
+            color: rgba(255,255,255,0.35);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10.5px;
+            letter-spacing: 0.22em;
+        }
+
+        @media (max-width: 768px) {
+            #hb-widget { padding: 22px 18px; min-height: 400px; border-radius: 16px; }
+            .contato-widget-wrap { padding: 0 0 2rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -941,7 +1111,7 @@
                 <a href="#" class="nav-link" data-section="projetos">Projetos</a>
                 <a href="#" class="nav-link" data-section="sobre">Sobre mim</a>
             </nav>
-            <button class="visit-btn" onclick="window.open('https://whatsapp.com/66996915943', '_blank')">WhatsApp →</button>
+            <button class="visit-btn" onclick="window.open('https://wa.me/5566996915943', '_blank')">WhatsApp →</button>
         </header>
 
         <!-- HOME SECTION -->
@@ -954,9 +1124,9 @@
                 <!-- ── ÚNICA MUDANÇA HTML: spans para Francielly e Alves ── -->
                 <h1 id="hero-title"><span class="francielly">Francielly</span> <span class="alves">Alves</span></h1>
                 <p class="subtitle" id="hero-subtitle">Transformando ideias em realidade através da tecnologia e educação</p>
-                <div class="cta-group">
-                    <button class="cta-primary" onclick="document.querySelector('[data-section=projetos]').click()">Ver projetos</button>
-                    <button class="cta-secondary" onclick="document.querySelector('[data-section=sobre]').click()">Sobre mim</button>
+                <div class="cta-group clickable">
+                    <button class="cta-primary" onclick="navTo('projetos')">Ver projetos</button>
+                    <button class="cta-secondary" onclick="navTo('sobre')">Sobre mim</button>
                 </div>
                 <div class="stats">
                     <div class="stat-item"><div class="stat-number" id="stat1">0</div><div class="stat-label">Anos de experiência</div></div>
@@ -994,7 +1164,7 @@
         </section>
 
         <!-- SOBRE MIM SECTION -->
-        <section id="sobre" class="section sobre-mim">
+        <section id="sobre" class="section sobre-mim clickable">
             <div class="sobre-hero">
                 <h1 class="sobre-titulo-principal">
                     CRIATIVA<br>EM <span>FRONT-END</span><br>E UI/UX
@@ -1058,14 +1228,70 @@
                     <a href="https://github.com/ctrlplayfran" target="_blank" class="social-link">GitHub</a>
                 </div>
             </div>
+
+            <!-- Widget Hybridbots -->
+            <div class="contato-widget-wrap">
+                <div id="hb-widget">
+                    <canvas id="hb-stars"></canvas>
+                    <div class="hb-header">
+                        <svg width="20" height="20" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="8.5" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" stroke-dasharray="2.2 2.8" />
+                            <circle cx="10" cy="10" r="1.8" fill="rgba(255,255,255,0.45)" />
+                        </svg>
+                        <span class="hb-brand">HYBRIDBOTS®</span>
+                    </div>
+                    <div class="hb-center">
+                        <div id="hb-label">Junte-se a nós</div>
+                        <div id="hb-pill">
+                            <input id="hb-inp" type="email" placeholder="SEU E-MAIL" autocomplete="email" />
+                            <button id="hb-btn" aria-label="Enviar">
+                                <svg id="hb-ico" width="15" height="15" viewBox="0 0 15 15" fill="none">
+                                    <path d="M2.5 7.5H12.5M12.5 7.5L8.5 3.5M12.5 7.5L8.5 11.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="hb-social-wrap">
+                            <span class="hb-social-label">Conecte-se comigo</span>
+                            <div class="hb-social-row">
+                                <a href="https://www.linkedin.com/in/francielly-alves-pereira-128680241/" target="_blank" class="hb-icon" aria-label="LinkedIn">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                        <rect x="2" y="9" width="4" height="12" rx="1" stroke="#fff" stroke-width="1.8" />
+                                        <circle cx="4" cy="4" r="2" stroke="#fff" stroke-width="1.8" />
+                                    </svg>
+                                </a>
+                                <a href="https://www.instagram.com/hybridbots/" target="_blank" class="hb-icon" aria-label="Instagram">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                        <rect x="2" y="2" width="20" height="20" rx="5" stroke="#fff" stroke-width="1.8" />
+                                        <circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="1.8" />
+                                        <circle cx="17.5" cy="6.5" r="1" fill="#fff" />
+                                    </svg>
+                                </a>
+                                <a href="https://github.com/ctrlplayfran" target="_blank" class="hb-icon" aria-label="GitHub">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hb-footer">
+                        <svg width="16" height="16" viewBox="0 0 16 16">
+                            <circle cx="8" cy="8" r="6.5" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-dasharray="2 2.5" />
+                            <circle cx="8" cy="8" r="1.4" fill="rgba(255,255,255,0.35)" />
+                        </svg>
+                        <span>@HYBRIDBOTS</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <footer class="clickable">
             <div>© 2026 Francielly Alves · Portfólio</div>
             <div class="footer-links">
-                <a href="#" onclick="document.querySelector('[data-section=home]').click()">Index</a>
-                <a href="#" onclick="document.querySelector('[data-section=projetos]').click()">Projetos</a>
-                <a href="#" onclick="document.querySelector('[data-section=sobre]').click()">Sobre</a>
+                <a href="#" onclick="navTo('home')">Index</a>
+                <a href="#" onclick="navTo('projetos')">Projetos</a>
+                <a href="#" onclick="navTo('sobre')">Sobre</a>
             </div>
         </footer>
     </div>
@@ -1357,22 +1583,102 @@
             sobre: document.getElementById('sobre')
         };
 
+        window.navTo = function navTo(id) {
+            if (!sections[id]) return;
+            navLinks.forEach(l => l.classList.remove('active'));
+            const activeLink = document.querySelector(`[data-section="${id}"]`);
+            if (activeLink) activeLink.classList.add('active');
+            Object.values(sections).forEach(s => s.classList.remove('active'));
+            sections[id].classList.add('active');
+            window.scrollTo(0, 0);
+            if (id === 'projetos') buildStrips();
+            if (id === 'sobre') animateSobreEntry();
+        }
+
         navLinks.forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
                 const id = link.dataset.section;
-                if (!id) return;
-
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-                Object.values(sections).forEach(s => s.classList.remove('active'));
-                sections[id].classList.add('active');
-                window.scrollTo(0, 0);
-
-                if (id === 'projetos') buildStrips();
-                if (id === 'sobre') animateSobreEntry();
+                if (id) navTo(id);
             });
         });
+
+
+        // ====================================
+        // WIDGET HYBRIDBOTS
+        // ====================================
+        (function initHbWidget() {
+            const cv = document.getElementById('hb-stars');
+            if (!cv) return;
+            const cx = cv.getContext('2d');
+            const wrap = document.getElementById('hb-widget');
+            function sz() { cv.width = wrap.offsetWidth; cv.height = wrap.offsetHeight; }
+            sz();
+            const pts = Array.from({ length: 90 }, () => ({
+                x: Math.random() * cv.width, y: Math.random() * cv.height,
+                r: Math.random() * 1.2 + 0.2,
+                vx: (Math.random() - .5) * 0.18, vy: (Math.random() - .5) * 0.18,
+                o: Math.random() * 0.45 + 0.08
+            }));
+            (function loop() {
+                cx.clearRect(0, 0, cv.width, cv.height);
+                pts.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = cv.width; if (p.x > cv.width) p.x = 0;
+                    if (p.y < 0) p.y = cv.height; if (p.y > cv.height) p.y = 0;
+                    cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    cx.fillStyle = `rgba(255,255,255,${p.o})`; cx.fill();
+                });
+                requestAnimationFrame(loop);
+            })();
+
+            const pill = document.getElementById('hb-pill');
+            const inp  = document.getElementById('hb-inp');
+            const btn  = document.getElementById('hb-btn');
+            const label = document.getElementById('hb-label');
+            const ico  = document.getElementById('hb-ico');
+            let open = false, done = false;
+
+            btn.addEventListener('click', () => {
+                if (done) return;
+                if (!open) {
+                    open = true;
+                    label.style.opacity = '0'; label.style.transform = 'translateY(-6px)';
+                    pill.style.width = '260px';
+                    setTimeout(() => {
+                        inp.style.opacity = '1'; inp.style.pointerEvents = 'auto';
+                        setTimeout(() => inp.focus(), 80);
+                    }, 280);
+                    return;
+                }
+                const v = inp.value.trim();
+                if (!v || !v.includes('@')) {
+                    pill.style.outline = '1px solid rgba(255,100,100,0.5)';
+                    setTimeout(() => pill.style.outline = 'none', 1000);
+                    inp.focus(); return;
+                }
+                done = true;
+                ico.innerHTML = '<path d="M2 7.5L6.5 12L13 3.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>';
+                inp.style.opacity = '0'; inp.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    pill.style.width = '46px';
+                    setTimeout(() => {
+                        label.textContent = 'Obrigado!';
+                        label.style.transform = 'translateY(0)'; label.style.opacity = '1';
+                    }, 400);
+                }, 500);
+            });
+
+            inp.addEventListener('keydown', e => {
+                if (e.key === 'Enter') btn.click();
+                if (e.key === 'Escape' && open && !done) {
+                    open = false;
+                    inp.style.opacity = '0'; inp.style.pointerEvents = 'none'; inp.value = '';
+                    pill.style.width = '46px';
+                    setTimeout(() => { label.style.transform = 'translateY(0)'; label.style.opacity = '1'; }, 200);
+                }
+            });
+        })();
 
         // Three.js — igual ao original
         const scene = new THREE.Scene();
