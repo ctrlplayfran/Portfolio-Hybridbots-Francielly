@@ -276,6 +276,25 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* ── ÚNICA MUDANÇA CSS: reset no hero-title + estilos dos 2 spans ── */
+        h1#hero-title {
+            background: none;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset;
+        }
+        h1#hero-title .francielly {
+            background: linear-gradient(135deg, #FFFFFF 0%, #CCCCCC 50%, #AAAAAA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h1#hero-title .alves {
+            background: none;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.35);
+        }
+        /* ── FIM DA MUDANÇA CSS ── */
+
         .subtitle {
             font-size: clamp(0.9rem, 3.5vw, 1.2rem);
             color: #888;
@@ -448,25 +467,30 @@
         .pstrip-img {
             position: absolute; inset: 0;
             background-size: cover; background-position: center;
-            opacity: 0;
+            opacity: 1;
             transform: scale(1.06);
-            transition: opacity 0.55s 0.1s, transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+            filter: grayscale(100%) brightness(0.6);
+            transition: filter 0.55s 0.1s, transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
         }
-        .pstrip:hover .pstrip-img { opacity: 1; transform: scale(1); }
+        .pstrip:hover .pstrip-img {
+            filter: grayscale(0%) brightness(0.85);
+            transform: scale(1);
+        }
 
         /* Overlay escuro */
         .pstrip-overlay {
             position: absolute; inset: 0;
             background: #0B0B0B;
-            opacity: 0.88;
+            opacity: 0.45;
             transition: opacity 0.55s;
         }
-        .pstrip:hover .pstrip-overlay { opacity: 0.28; }
+        .pstrip:hover .pstrip-overlay { opacity: 0.15; }
 
-        /* Fill sólido (visível quando não há hover) */
+        /* Fill sólido (removido — imagem aparece em P&B por padrão) */
         .pstrip-fill {
             position: absolute; inset: 0;
             background: linear-gradient(180deg, #130920 0%, #0B0B0B 100%);
+            opacity: 0;
             transition: opacity 0.5s;
         }
         .pstrip:hover .pstrip-fill { opacity: 0; }
@@ -863,7 +887,8 @@
                     <span>PROFESSORA DE ROBÓTICA</span>
                     <span class="views">· DESENVOLVEDORA FULL STACK</span>
                 </div>
-                <h1 id="hero-title">Francielly Alves</h1>
+                <!-- ── ÚNICA MUDANÇA HTML: spans para Francielly e Alves ── -->
+                <h1 id="hero-title"><span class="francielly">Francielly</span> <span class="alves">Alves</span></h1>
                 <p class="subtitle" id="hero-subtitle">Transformando ideias em realidade através da tecnologia e educação</p>
                 <div class="cta-group">
                     <button class="cta-primary" onclick="document.querySelector('[data-section=projetos]').click()">Ver projetos</button>
@@ -962,7 +987,7 @@
                 Já passei por instituições como Colégio Marista, Colégio Ânima, Colégio Mais Ânima, Colégio Excelso e Colégio Anglo, sempre desenvolvendo projetos inovadores em <strong>robótica, IA e visão computacional</strong>.
             </div>
             <div class="contato-section">
-                <a href="mailto:professorafisicafran@gmail.com" class="contato-email">professorafisicafran@gmail.com</a>
+                <a href="/cdn-cgi/l/email-protection#5e2e2c31383b2d2d312c3f38372d373d3f382c3f301e39333f3732703d3133" class="contato-email"><span class="__cf_email__" data-cfemail="a2d2d0cdc4c7d1d1cdd0c3c4cbd1cbc1c3c4d0c3cce2c5cfc3cbce8cc1cdcf">[email&#160;protected]</span></a>
                 <div class="contato-social">
                     <a href="https://www.linkedin.com/in/francielly-alves-pereira-128680241/" target="_blank" class="social-link">LinkedIn</a>
                     <a href="https://www.instagram.com/hybridbots/" target="_blank" class="social-link">Instagram</a>
@@ -982,7 +1007,7 @@
     </div>
 
     <!-- Three.js -->
-    <script type="importmap">
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="importmap">
         {
             "imports": {
                 "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
