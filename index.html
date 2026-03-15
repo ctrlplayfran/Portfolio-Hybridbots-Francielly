@@ -836,6 +836,26 @@
         @media (hover: none) and (pointer: coarse) {
             .timeline-item:hover, .skill-item:hover { transform: none; }
             nav a.active::after { height: 3px; }
+
+            /* Tira ativa no mobile (primeiro toque) */
+            .pstrip.touch-active {
+                flex: 3.5 !important;
+            }
+            .pstrip.touch-active .pstrip-img {
+                filter: grayscale(0%) brightness(0.85) !important;
+                transform: scale(1) !important;
+            }
+            .pstrip.touch-active .pstrip-overlay {
+                opacity: 0.15 !important;
+            }
+            .pstrip.touch-active .pstrip-label {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+            }
+            .pstrip.touch-active .pstrip-num {
+                opacity: 1 !important;
+                color: #a855f7 !important;
+            }
         }
     </style>
 </head>
@@ -1169,7 +1189,37 @@
 
                 strip.addEventListener('mouseenter', () => { stripCursor.style.opacity = '1'; });
                 strip.addEventListener('mouseleave', () => { stripCursor.style.opacity = '0'; });
-                strip.addEventListener('click', () => openProject(i));
+
+                // Desktop: clique abre direto
+                strip.addEventListener('click', (e) => {
+                    // No mobile o click é disparado após touchend — ignora se já tratado pelo touch
+                    if (strip._touchHandled) { strip._touchHandled = false; return; }
+                    openProject(i);
+                });
+
+                // Mobile: primeiro toque expande e mostra infos, segundo toque abre projeto
+                strip._touchHandled = false;
+                strip.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    strip._touchHandled = true;
+                    if (!strip._tapped) {
+                        // Primeiro toque: recolhe todas, expande esta
+                        document.querySelectorAll('.pstrip').forEach(s => s.classList.remove('touch-active'));
+                        strip.classList.add('touch-active');
+                        strip._tapped = true;
+                        strip._tapTimer = setTimeout(() => {
+                            strip._tapped = false;
+                            strip.classList.remove('touch-active');
+                        }, 3000);
+                    } else {
+                        // Segundo toque: abre o projeto
+                        clearTimeout(strip._tapTimer);
+                        strip._tapped = false;
+                        strip.classList.remove('touch-active');
+                        openProject(i);
+                    }
+                }, { passive: false });
+
                 container.appendChild(strip);
 
                 // WebGL noise shader por tira
