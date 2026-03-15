@@ -520,6 +520,8 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(15px, 1.7vw, 28px);
             letter-spacing: 0.04em; line-height: 1; color: #fff;
+            white-space: normal;
+            word-break: break-word;
         }
         .pstrip-label p {
             font-family: 'Barlow Condensed', sans-serif;
@@ -863,7 +865,7 @@
 
             /* Tira ativa no mobile (primeiro toque) */
             .pstrip.touch-active {
-                flex: 6 !important;
+                flex: 14 !important;
             }
             .pstrip.touch-active .pstrip-img {
                 filter: grayscale(0%) brightness(0.85) !important;
@@ -1228,17 +1230,15 @@
                     e.preventDefault();
                     strip._touchHandled = true;
                     if (!strip._tapped) {
-                        // Primeiro toque: recolhe todas, expande esta
-                        document.querySelectorAll('.pstrip').forEach(s => s.classList.remove('touch-active'));
+                        // Primeiro toque: recolhe todas, expande esta (sem timer — fica até tocar em outra)
+                        document.querySelectorAll('.pstrip').forEach(s => {
+                            s.classList.remove('touch-active');
+                            s._tapped = false;
+                        });
                         strip.classList.add('touch-active');
                         strip._tapped = true;
-                        strip._tapTimer = setTimeout(() => {
-                            strip._tapped = false;
-                            strip.classList.remove('touch-active');
-                        }, 3000);
                     } else {
                         // Segundo toque: abre o projeto
-                        clearTimeout(strip._tapTimer);
                         strip._tapped = false;
                         strip.classList.remove('touch-active');
                         openProject(i);
