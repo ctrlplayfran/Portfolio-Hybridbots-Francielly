@@ -459,15 +459,17 @@
             position: absolute; inset: 0;
             width: 100%; height: 100%;
             opacity: 0;
+            z-index: 0;
             transition: opacity 0.5s;
         }
-        .pstrip:hover .pstrip-gl { opacity: 1; }
+        .pstrip:hover .pstrip-gl { opacity: 0; }
 
         /* Foto de fundo */
         .pstrip-img {
             position: absolute; inset: 0;
             background-size: cover; background-position: center;
             opacity: 1;
+            z-index: 1;
             transform: scale(1.06);
             filter: grayscale(100%) brightness(0.6);
             transition: filter 0.55s 0.1s, transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
@@ -482,15 +484,17 @@
             position: absolute; inset: 0;
             background: #0B0B0B;
             opacity: 0.45;
+            z-index: 2;
             transition: opacity 0.55s;
         }
         .pstrip:hover .pstrip-overlay { opacity: 0.15; }
 
-        /* Fill sólido (removido — imagem aparece em P&B por padrão) */
+        /* Fill sólido */
         .pstrip-fill {
             position: absolute; inset: 0;
             background: linear-gradient(180deg, #130920 0%, #0B0B0B 100%);
             opacity: 0;
+            z-index: 3;
             transition: opacity 0.5s;
         }
         .pstrip:hover .pstrip-fill { opacity: 0; }
@@ -550,10 +554,24 @@
         }
         #proj-expanded.open { opacity: 1; pointer-events: all; }
 
-        #pe-image { flex: 1; background-size: cover; background-position: center; }
+        #pe-image {
+            flex: 2;
+            background-color: #000000;
+            position: relative;
+            overflow: hidden;
+        }
+        #pe-image img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+            display: block;
+        }
 
         #pe-info {
-            width: min(420px, 38vw);
+            width: min(380px, 32vw);
             padding: clamp(50px, 8vh, 90px) clamp(24px, 4vw, 44px);
             display: flex; flex-direction: column; justify-content: flex-end;
             border-left: 1px solid rgba(255, 255, 255, 0.06);
@@ -963,7 +981,7 @@
 
             <!-- Painel expandido ao clicar numa tira — fica dentro da section -->
             <div id="proj-expanded">
-                <div id="pe-image"></div>
+                <div id="pe-image"><img id="pe-img-tag" src="" alt=""></div>
                 <div id="pe-info">
                     <div id="pe-count"></div>
                     <div id="pe-title"><span id="pe-title-txt"></span></div>
@@ -1170,19 +1188,20 @@
         // =====================================================
         // TIRAS VERTICAIS — dados e lógica
         // =====================================================
+        const V = 1; // ← MUDE ESTE NÚMERO SEMPRE QUE TROCAR UMA IMAGEM (ex: 2, 3, 4...)
         const PROJECTS = [
-            { num:'01', title:'Site para Corretor',    cat:'Web App',                yr:'2025', tags:['HTML/CSS','Responsivo'],  desc:'Site profissional responsivo com design moderno para corretor de imóveis. Interface clean e otimizada para conversão.',          link:'projetos/projeto-site-corretor.html', seed:3   },
-            { num:'02', title:'Plataforma de Login',   cat:'Full Stack',             yr:'2025', tags:['React','Node.js'],        desc:'Sistema completo de autenticação com React + Node.js. Inclui cadastro, login e recuperação de senha.',                         link:'projetos/cadastro-usuarios.html',     seed:20  },
-            { num:'03', title:'Grogu — IA',            cat:'Inteligência Artificial',yr:'2024', tags:['Python','NLP'],           desc:'Assistente virtual com processamento de linguagem natural. Capaz de interagir e responder perguntas de forma contextual.',     link:'projetos/grogu.html',                 seed:37  },
-            { num:'04', title:'Mão Robótica',          cat:'Visão Computacional',    yr:'2024', tags:['OpenCV','Python'],        desc:'Controle por visão computacional com OpenCV. A mão robótica replica os movimentos da mão humana em tempo real.',                link:'projetos/mao-robotica.html',          seed:54  },
-            { num:'05', title:'Olhos Vigia',           cat:'Monitoramento',          yr:'2023', tags:['OpenCV','Python'],        desc:'Sistema de monitoramento com detecção facial. Identifica e rastreia rostos em tempo real para segurança.',                     link:'projetos/olhos-vigia.html',           seed:71  },
-            { num:'06', title:'Robô Galinha',          cat:'Robótica',               yr:'2023', tags:['Arduino','Sensor'],       desc:'Robô seguidor de linha com Arduino. Utiliza sensores infravermelhos para seguir trajetórias pré-definidas.',                   link:'projetos/robo-galinha.html',          seed:88  },
-            { num:'07', title:'Varal Automatizado',    cat:'Automação',              yr:'2023', tags:['Arduino','Sensor'],       desc:'Sensor de chuva para proteção automática. Recolhe as roupas automaticamente quando detecta chuva.',                            link:'projetos/varal-automatizado.html',    seed:105 },
-            { num:'08', title:'Irrigador Automático',  cat:'IoT',                    yr:'2022', tags:['Arduino','Sensor'],       desc:'Sensor de umidade para plantas. Irriga automaticamente quando o solo está seco, economizando água.',                          link:'projetos/irrigador-automatico.html',  seed:122 },
-            { num:'09', title:'Bob Esponja',           cat:'Robótica',               yr:'2022', tags:['Arduino','Bluetooth'],    desc:'Robô controlado por Bluetooth. Pode ser operado via smartphone com interface personalizada.',                                  link:'projetos/bob-esponja.html',           seed:139 },
-            { num:'10', title:'Angry Birds',           cat:'Jogo Educativo',         yr:'2022', tags:['Scratch','Interativo'],   desc:'Versão educacional do Angry Birds para ensinar lógica de programação com sistema de pontuação.',                             link:'projetos/angry-birds.html',           seed:156 },
-            { num:'11', title:'Labirinto',             cat:'Jogo',                   yr:'2022', tags:['Arduino','Joystick'],     desc:'Desafio de navegar por um labirinto físico usando um robô controlado por joystick remotamente.',                             link:'projetos/labirinto.html',             seed:173 },
-            { num:'12', title:'Sistema de Cadastro',   cat:'CRUD',                   yr:'2025', tags:['React','MySQL'],          desc:'CRUD completo com React, Node.js e MySQL. Sistema de gerenciamento de usuários com interface intuitiva.',                     link:'projetos/cadastro-usuarios.html',     seed:190 },
+            { num:'01', title:'Site para Corretor',    cat:'Web App',                yr:'2025', tags:['HTML/CSS','Responsivo'],  desc:'Site profissional responsivo com design moderno para corretor de imóveis. Interface clean e otimizada para conversão.',          link:'projetos/projeto-site-corretor.html', img:'https://picsum.photos/seed/3/800/1200'     },
+            { num:'02', title:'Plataforma de Login',   cat:'Full Stack',             yr:'2025', tags:['React','Node.js'],        desc:'Sistema completo de autenticação com React + Node.js. Inclui cadastro, login e recuperação de senha.',                         link:'projetos/cadastro-usuarios.html',     img:`imgs/proj_02.webp?v=${V}`                         },
+            { num:'03', title:'Grogu — IA',            cat:'Inteligência Artificial',yr:'2024', tags:['Python','NLP'],           desc:'Assistente virtual com processamento de linguagem natural. Capaz de interagir e responder perguntas de forma contextual.',     link:'projetos/grogu.html',                 img:`imgs/proj_03.webp?v=${V}`                         },
+            { num:'04', title:'Mão Robótica',          cat:'Visão Computacional',    yr:'2024', tags:['OpenCV','Python'],        desc:'Controle por visão computacional com OpenCV. A mão robótica replica os movimentos da mão humana em tempo real.',                link:'projetos/mao-robotica.html',          img:`imgs/proj_04.webp?v=${V}`                         },
+            { num:'05', title:'Olhos Vigia',           cat:'Monitoramento',          yr:'2023', tags:['OpenCV','Python'],        desc:'Sistema de monitoramento com detecção facial. Identifica e rastreia rostos em tempo real para segurança.',                     link:'projetos/olhos-vigia.html',           img:`imgs/proj_05.webp?v=${V}`                         },
+            { num:'06', title:'Robô Galinha',          cat:'Robótica',               yr:'2023', tags:['Arduino','Sensor'],       desc:'Robô seguidor de linha com Arduino. Utiliza sensores infravermelhos para seguir trajetórias pré-definidas.',                   link:'projetos/robo-galinha.html',          img:`imgs/proj_06.webp?v=${V}`                         },
+            { num:'07', title:'Varal Automatizado',    cat:'Automação',              yr:'2023', tags:['Arduino','Sensor'],       desc:'Sensor de chuva para proteção automática. Recolhe as roupas automaticamente quando detecta chuva.',                            link:'projetos/varal-automatizado.html',    img:`imgs/proj_07.webp?v=${V}`                         },
+            { num:'08', title:'Irrigador Automático',  cat:'IoT',                    yr:'2022', tags:['Arduino','Sensor'],       desc:'Sensor de umidade para plantas. Irriga automaticamente quando o solo está seco, economizando água.',                          link:'projetos/irrigador-automatico.html',  img:`imgs/proj_08.webp?v=${V}`                         },
+            { num:'09', title:'Bob Esponja',           cat:'Robótica',               yr:'2022', tags:['Arduino','Bluetooth'],    desc:'Robô controlado por Bluetooth. Pode ser operado via smartphone com interface personalizada.',                                  link:'projetos/bob-esponja.html',           img:`imgs/proj_09.webp?v=${V}`                         },
+            { num:'10', title:'Angry Birds',           cat:'Jogo Educativo',         yr:'2022', tags:['Scratch','Interativo'],   desc:'Versão educacional do Angry Birds para ensinar lógica de programação com sistema de pontuação.',                             link:'projetos/angry-birds.html',           img:`imgs/proj_10.webp?v=${V}`                         },
+            { num:'11', title:'Labirinto',             cat:'Jogo',                   yr:'2022', tags:['Arduino','Joystick'],     desc:'Desafio de navegar por um labirinto físico usando um robô controlado por joystick remotamente.',                             link:'projetos/labirinto.html',             img:`imgs/proj_11.webp?v=${V}`                         },
+            { num:'12', title:'Sistema de Cadastro',   cat:'CRUD',                   yr:'2025', tags:['React','MySQL'],          desc:'CRUD completo com React, Node.js e MySQL. Sistema de gerenciamento de usuários com interface intuitiva.',                     link:'projetos/cadastro-usuarios.html',     img:`imgs/proj_12.webp?v=${V}`                         },
         ];
 
         // Cursor das tiras
@@ -1203,7 +1222,7 @@
                 strip.className = 'pstrip';
                 strip.innerHTML =
                     '<canvas class="pstrip-gl" id="pgl' + i + '"></canvas>' +
-                    '<div class="pstrip-img" style="background-image:url(\'https://picsum.photos/seed/' + p.seed + '/800/1200\')"></div>' +
+                    '<div class="pstrip-img" style="background-image:url(\'' + p.img + '\')"></div>' +
                     '<div class="pstrip-overlay"></div>' +
                     '<div class="pstrip-fill"></div>' +
                     '<div class="pstrip-num">' + p.num + '</div>' +
@@ -1314,7 +1333,8 @@
             expanded = true;
             const p = PROJECTS[idx];
             const panel = document.getElementById('proj-expanded');
-            document.getElementById('pe-image').style.backgroundImage = "url('https://picsum.photos/seed/" + p.seed + "/1200/900')";
+            document.getElementById('pe-image').style.backgroundImage = "";
+            document.getElementById('pe-img-tag').src = p.img;
             document.getElementById('pe-title-txt').textContent = p.title;
             document.getElementById('pe-category').textContent  = p.cat + ' · ' + p.yr;
             document.getElementById('pe-desc').textContent      = p.desc;
